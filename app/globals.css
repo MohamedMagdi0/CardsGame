@@ -25,3 +25,92 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+.game-card,
+.card-stack {
+  width: 220px;
+  height: 310px;
+  border-radius: 28px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: linear-gradient(180deg, #ffffff 0%, #f6f7fb 100%);
+  box-shadow: 0 28px 40px rgba(15, 23, 42, 0.12);
+}
+
+.card-stack {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  transform: translate(16px, 16px) rotate(3deg);
+  background: linear-gradient(180deg, #e5e7eb 0%, #f8fafc 100%);
+  box-shadow: 0 18px 30px rgba(15, 23, 42, 0.08);
+  z-index: 0;
+}
+
+.game-card {
+  position: relative;
+  z-index: 10;
+  transform-style: preserve-3d;
+  transition: transform 0.35s ease, box-shadow 0.35s ease;
+  transform: perspective(800px) rotateX(0deg);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1.25rem;
+}
+
+.game-card.flip {
+  transform: perspective(800px) rotateX(18deg) scale(1.01);
+}
+
+.game-card:hover {
+  transform: perspective(800px) translateY(-4px) scale(1.01);
+  box-shadow: 0 34px 50px rgba(15, 23, 42, 0.18);
+}
+
+.card-corner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.top-left {
+  align-items: flex-start;
+}
+
+.bottom-right {
+  align-items: flex-end;
+  transform: rotate(180deg);
+}
+
+.card-suit {
+  font-size: 5.5rem;
+  line-height: 0.85;
+  text-align: center;
+  opacity: 0.9;
+}
+
+.card-red {
+  color: #dc2626;
+}
+
+.card-black {
+  color: #111827;
+}
+
+.card-corner span {
+  display: block;
+}
+
+@media (max-width: 640px) {
+  .game-card,
+  .card-stack {
+    width: 180px;
+    height: 250px;
+  }
+
+  .card-suit {
+    font-size: 4.25rem;
+  }
+}

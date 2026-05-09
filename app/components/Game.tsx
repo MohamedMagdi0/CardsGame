@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card } from "@/lib/types";
 
 interface GameState {
+  deck: Card[];
   currentCard: Card | null;
   score: number;
   faceValues: Record<"J" | "Q" | "K", number>;
@@ -13,6 +14,14 @@ interface GameState {
 export default function Game() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [loading, setLoading] = useState(false);
+  const [cardFlipped, setCardFlipped] = useState(false);
+
+  useEffect(() => {
+    if (!gameState?.currentCard) return;
+    setCardFlipped(true);
+    const timeout = setTimeout(() => setCardFlipped(false), 420);
+    return () => clearTimeout(timeout);
+  }, [gameState?.currentCard]);
 
   console.log(gameState);
 
@@ -102,23 +111,50 @@ export default function Game() {
         </div>
       ) : (
         <div className="text-center">
-          <div className="text-6xl mb-8">
-            {gameState.currentCard
-              ? `${gameState.currentCard.rank}${getSuitSymbol(gameState.currentCard.suit)}`
-              : ""}
+          <div className="relative mb-8">
+            <div className="card-stack"></div>
+            <div
+              className={`game-card ${cardFlipped ? "flip" : ""} ${
+                gameState.currentCard &&
+                ["hearts", "diamonds"].includes(gameState.currentCard.suit)
+                  ? "card-red"
+                  : "card-black"
+              }`}
+            >
+              <div className="card-corner top-left">
+                <span>{gameState.currentCard?.rank}</span>
+                <span>{getSuitSymbol(gameState.currentCard?.suit ?? "")}</span>
+              </div>
+              <div className="card-suit">
+                {getSuitSymbol(gameState.currentCard?.suit ?? "")}
+              </div>
+              <div className="card-corner bottom-right">
+                <span>{gameState.currentCard?.rank}</span>
+                <span>{getSuitSymbol(gameState.currentCard?.suit ?? "")}</span>
+              </div>
+            </div>
           </div>
-          <div className="flex gap-4">
+
+          <div className="flex flex-col items-center gap-2 mb-6 text-sm text-slate-600">
+            <span>Deck remaining: {gameState.deck.length}</span>
+            <span>
+              Face values: J: {gameState.faceValues.J}, Q:{" "}
+              {gameState.faceValues.Q}, K: {gameState.faceValues.K}
+            </span>
+          </div>
+
+          <div className="flex gap-4 justify-center">
             <button
               onClick={() => makeGuess("higher")}
               disabled={loading}
-              className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 disabled:opacity-50"
+              className="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 active:scale-[0.98] transition-transform disabled:opacity-50"
             >
               Higher
             </button>
             <button
               onClick={() => makeGuess("lower")}
               disabled={loading}
-              className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 disabled:opacity-50"
+              className="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 active:scale-[0.98] transition-transform disabled:opacity-50"
             >
               Lower
             </button>
