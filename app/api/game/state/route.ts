@@ -12,6 +12,7 @@ export async function GET() {
 
   const gameState: GameState = JSON.parse(gameStateCookie.value);
   return NextResponse.json({
+    gameState,
     currentCard: gameState.currentCard,
     score: gameState.score,
     faceValues: gameState.faceValues,
