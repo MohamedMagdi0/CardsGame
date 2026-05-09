@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Card } from "@/lib/types";
 
 interface GameState {
@@ -16,25 +16,6 @@ export default function Game() {
 
   console.log(gameState);
 
-  useEffect(() => {
-    fetchGameState();
-  }, []);
-
-  const fetchGameState = async () => {
-    try {
-      const res = await fetch("/api/game/state");
-      if (!res.ok) throw new Error("Failed to fetch game state");
-      const data = await res.json();
-      if ("gameState" in data) {
-        setGameState(data.gameState);
-      } else {
-        setGameState(data);
-      }
-    } catch (error) {
-      console.error("Error fetching game state:", error);
-    }
-  };
-
   const startGame = async () => {
     setLoading(true);
     console.log("starting...");
@@ -49,7 +30,7 @@ export default function Game() {
       if (data.gameState) {
         setGameState(data.gameState);
       } else {
-        await fetchGameState();
+        setGameState(data);
       }
     } catch (error) {
       console.error("Error starting game:", error);
