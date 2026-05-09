@@ -64,9 +64,29 @@ export function makeGuess(
   state: GameState,
   guess: "higher" | "lower",
 ): GameState {
-  if (state.gameOver || state.deck.length === 0) return state;
+  if (state.gameOver) return state;
 
-  const nextCard = state.deck.pop()!;
+  let newDeck = [...state.deck];
+  let reshufflesLeft = state.reshufflesLeft;
+  let gameOver = false;
+
+  if (newDeck.length === 0) {
+    if (reshufflesLeft > 0) {
+      newDeck = shuffleDeck(createDeck());
+      reshufflesLeft -= 1;
+    } else {
+      gameOver = true;
+    }
+  }
+
+  if (gameOver) {
+    return {
+      ...state,
+      gameOver: true,
+    };
+  }
+
+  const nextCard = newDeck.pop()!;
   const isCorrect = evaluateGuess(state.currentCard!, nextCard, guess);
 
   let newScore = state.score;
@@ -97,19 +117,6 @@ export function makeGuess(
     ...nextCard,
     value: getValue(nextCard.rank, newFaceValues),
   };
-
-  let newDeck = [...state.deck];
-  let reshufflesLeft = state.reshufflesLeft;
-  let gameOver = false;
-
-  if (newDeck.length === 0) {
-    if (reshufflesLeft > 0) {
-      newDeck = shuffleDeck(createDeck());
-      reshufflesLeft -= 1;
-    } else {
-      gameOver = true;
-    }
-  }
 
   return {
     deck: newDeck,

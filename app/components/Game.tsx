@@ -14,6 +14,8 @@ export default function Game() {
   const [gameState, setGameState] = useState<GameState | null>(null);
   const [loading, setLoading] = useState(false);
 
+  console.log(gameState);
+
   useEffect(() => {
     fetchGameState();
   }, []);
