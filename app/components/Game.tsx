@@ -19,28 +19,67 @@ export default function Game() {
   }, []);
 
   const fetchGameState = async () => {
-    const res = await fetch("/api/game/state");
-    const data = await res.json();
-    setGameState(data);
+    try {
+      const res = await fetch("/api/game/state");
+      if (!res.ok) throw new Error("Failed to fetch game state");
+      const data = await res.json();
+      if ("gameState" in data) {
+        setGameState(data.gameState);
+      } else {
+        setGameState(data);
+      }
+    } catch (error) {
+      console.error("Error fetching game state:", error);
+    }
   };
 
   const startGame = async () => {
     setLoading(true);
-    await fetch("/api/game/start", { method: "POST" });
-    await fetchGameState();
-    setLoading(false);
+    console.log("starting...");
+
+    try {
+      const res = await fetch("/api/game/start", {
+        method: "POST",
+        credentials: "same-origin",
+      });
+      if (!res.ok) throw new Error("Failed to start game");
+      const data = await res.json();
+      if (data.gameState) {
+        setGameState(data.gameState);
+      } else {
+        await fetchGameState();
+      }
+    } catch (error) {
+      console.error("Error starting game:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const makeGuess = async (guess: "higher" | "lower") => {
     setLoading(true);
-    const res = await fetch("/api/game/guess", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ guess }),
-    });
-    const data = await res.json();
-    setGameState(data);
-    setLoading(false);
+    try {
+      const res = await fetch("/api/game/guess", {
+        method: "POST",
+        credentials: "same-origin",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ guess, gameState }),
+      });
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null);
+        throw new Error(errorData?.error ?? "Failed to make guess");
+      }
+      const data = await res.json();
+      if (data.gameState) {
+        setGameState(data.gameState);
+      } else {
+        setGameState(data);
+      }
+    } catch (error) {
+      console.error("Error making guess:", error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!gameState) {
